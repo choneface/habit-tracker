@@ -14,7 +14,6 @@ var (
 )
 
 type model struct {
-	altscreen  bool
 	quitting   bool
 	suspending bool
 }
@@ -38,7 +37,6 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Suspend
 		}
 	}
-	m.altscreen = !m.altscreen
 	return m, nil
 }
 
