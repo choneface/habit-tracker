@@ -13,25 +13,40 @@ var titleBarStyle = lipgloss.NewStyle().
 var headerStyle = lipgloss.NewStyle().
 	Foreground(lipgloss.Color("#f26363"))
 
-var helpSectionStyle = lipgloss.NewStyle().
-	Foreground(lipgloss.Color("#757575"))
-
 var containerStyle = lipgloss.NewStyle().
 	BorderStyle(lipgloss.NormalBorder()).
 	BorderForeground(lipgloss.Color("FAFAFA"))
 
 func (m model) View() string {
-	content := titleBarStyle.Render(m.Title) + "\n" + (containerStyle.Render(m.habitView())) + "\n" + (m.help.View(m.keys))
+	content := ""
+	content += titleBarStyle.Render(m.Title) + "\n" 
+	content += (containerStyle.Render(m.habitView())) + "\n"
+	content += m.helpContent()
 
 	return mainStyle.Render(content)
 }
 
-func (m model) habitView() string {
-	return ( headerStyle.Render(m.HabitView.Habits[m.HabitView.Index].Title) ) + "\n\n" + 
-	(renderHabitView(m.HabitView.Habits[m.HabitView.Index]))
+
+func (m model) mainContent() string {
+	if m.mode == habit_view_mode {
+		return m.habitView()
+	}
+	panic("Unsupported mode")
 }
 
-func renderHabitView(h habit) string {
+func (m model) helpContent() string {
+	if m.mode == habit_view_mode {
+		return m.help.View(m.habitViewKeys)
+	}
+	panic("Unsupported mode")
+}
+
+func (m model) habitView() string {
+	return ( headerStyle.Render(m.HabitView.Habits[m.HabitView.Index].Title) ) + "\n\n" + 
+	(renderHabitGrid(m.HabitView.Habits[m.HabitView.Index]))
+}
+
+func renderHabitGrid(h habit) string {
 	ret := ""
 	for index, value := range h.History {
 		block := emptyBlock()

@@ -17,24 +17,24 @@ type habit struct {
 	History []byte 
 }
 
-type habit_view struct {
+type habitView struct {
 	Habits []habit
 	Index int
 }
 
 type model struct {
 	Title string
-	HabitView habit_view
+	HabitView habitView
 
 	mode uint8 
-	keys keyMap
+	habitViewKeys habitViewKeyMap
 	help help.Model
 }
 
 
 
 func NewModel(title string) model {
-	hv := habit_view {
+	hv := habitView {
 		Habits: []habit{
 			{ 
 				"Chinese Lessons", 
@@ -53,7 +53,7 @@ func NewModel(title string) model {
 		Title: "Habit Tracker",
 		HabitView: hv,
 		mode: habit_view_mode,
-		keys: keys,
+		habitViewKeys: keys,
 		help: help.New(),
 	}
 }
@@ -63,26 +63,32 @@ func (m model) Init() tea.Cmd {
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	if m.mode == habit_view_mode {
+		return m.habitViewModeUpdate(msg)
+	} 
+	panic("Unsupported mode")
+}
+func (m model) habitViewModeUpdate(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 		case tea.KeyMsg:
 			switch {
-			case key.Matches(msg, m.keys.Quit):
+			case key.Matches(msg, m.habitViewKeys.Quit):
 				return m, tea.Quit
-			case key.Matches(msg, m.keys.Right):
+			case key.Matches(msg, m.habitViewKeys.Right):
 				idx := m.HabitView.Index + 1 
 				if idx >= len(m.HabitView.Habits) {
 					idx = 0 
 				}
 				m.HabitView.Index = idx 
 				break
-			case key.Matches(msg, m.keys.Left): 
+			case key.Matches(msg, m.habitViewKeys.Left): 
 				idx := m.HabitView.Index - 1
 				if idx < 0 {
 					idx = len(m.HabitView.Habits) - 1 
 				}
 				m.HabitView.Index = idx 
 				break
-			case key.Matches(msg, m.keys.Help):
+			case key.Matches(msg, m.habitViewKeys.Help):
 				m.help.ShowAll = !m.help.ShowAll
 				break
 		}
