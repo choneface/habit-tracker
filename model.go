@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -27,6 +28,7 @@ type model struct {
 
 	mode uint8 
 	keys keyMap
+	help help.Model
 }
 
 
@@ -52,6 +54,7 @@ func NewModel(title string) model {
 		HabitView: hv,
 		mode: habit_view_mode,
 		keys: keys,
+		help: help.New(),
 	}
 }
 
@@ -78,6 +81,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					idx = len(m.HabitView.Habits) - 1 
 				}
 				m.HabitView.Index = idx 
+				break
+			case key.Matches(msg, m.keys.Help):
+				m.help.ShowAll = !m.help.ShowAll
 				break
 		}
 	}
