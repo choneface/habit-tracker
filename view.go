@@ -2,15 +2,15 @@ package main
 
 import (
 	"github.com/charmbracelet/lipgloss"
+	"github.com/charmbracelet/bubbles/help"
 )
 var mainStyle = lipgloss.NewStyle().
 	AlignHorizontal(lipgloss.Center).
 	AlignVertical(lipgloss.Center)
 
-var style = lipgloss.NewStyle().
+var titleBarStyle = lipgloss.NewStyle().
     Bold(true).
-    Foreground(lipgloss.Color("#FAFAFA")).
-    Background(lipgloss.Color("#7D56F4"))
+    Foreground(lipgloss.Color("#FAFAFA"))
 
 var headerStyle = lipgloss.NewStyle().
 	Foreground(lipgloss.Color("#f26363"))
@@ -23,7 +23,7 @@ var containerStyle = lipgloss.NewStyle().
 	BorderForeground(lipgloss.Color("FAFAFA"))
 
 func (m model) View() string {
-	content := style.Render(m.Title) + "\n" + (containerStyle.Render(m.habitView())) + "\n" + (helpSectionStyle.Render(m.HelpOptions))
+	content := titleBarStyle.Render(m.Title) + "\n" + (containerStyle.Render(m.habitView())) + "\n" + (help.New().View(m.keys))
 
 	return mainStyle.Render(content)
 }

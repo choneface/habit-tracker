@@ -1,8 +1,14 @@
 package main
 
 import (
+	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 )
+
+const (
+	habit_view_mode = 0
+)
+
 
 type habit struct {
 	Title string
@@ -11,22 +17,32 @@ type habit struct {
 }
 
 type habit_view struct {
-	Title string 
 	Habits []habit
-	Index uint8
+	Index int
 }
 
 type model struct {
 	Title string
 	HabitView habit_view
-	HelpOptions string 
+
+	mode uint8 
+	keys keyMap
 }
+
+
 
 func NewModel(title string) model {
 	hv := habit_view {
-		Title: title,
 		Habits: []habit{
-			{ "Chinese Lessons", "Need passable chinese before having a kid", []byte{1,0,1,1,0,1,0,1,0,1,1,1,0,1,0},},
+			{ 
+				"Chinese Lessons", 
+				"Need passable chinese before having a kid",
+				[]byte{1,0,1,1,0,1,0,1,0,1,1,1,0,1,0},
+			}, {
+				"Spanish Lessons", 
+				"Need passable spanish before having a kid",
+				[]byte{0,1,0,1,0,1,1,1,0,1,1,0,0,0,1},
+			},
 		},
 		Index: 0,
 	}
@@ -34,7 +50,8 @@ func NewModel(title string) model {
 	return model {
 		Title: "Habit Tracker",
 		HabitView: hv,
-		HelpOptions: "q to exit",
+		mode: habit_view_mode,
+		keys: keys,
 	}
 }
 
@@ -45,9 +62,24 @@ func (m model) Init() tea.Cmd {
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 		case tea.KeyMsg:
-			if msg.String() == "q" {
+			switch {
+			case key.Matches(msg, m.keys.Quit):
 				return m, tea.Quit
-			}
+			case key.Matches(msg, m.keys.Right):
+				idx := m.HabitView.Index + 1 
+				if idx >= len(m.HabitView.Habits) {
+					idx = 0 
+				}
+				m.HabitView.Index = idx 
+				break
+			case key.Matches(msg, m.keys.Left): 
+				idx := m.HabitView.Index - 1
+				if idx < 0 {
+					idx = len(m.HabitView.Habits) - 1 
+				}
+				m.HabitView.Index = idx 
+				break
+		}
 	}
 
 	var cmd tea.Cmd
