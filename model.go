@@ -10,15 +10,31 @@ type habit struct {
 	History []byte 
 }
 
-type model struct {
+type habit_view struct {
 	Title string 
 	Habits []habit
+	Index uint8
+}
+
+type model struct {
+	Title string
+	HabitView habit_view
+	HelpOptions string 
 }
 
 func NewModel(title string) model {
-	return model {
+	hv := habit_view {
 		Title: title,
-		Habits: []habit{},
+		Habits: []habit{
+			{ "Chinese Lessons", "Need passable chinese before having a kid", []byte{1,0,1,1,0,1,0,1,0,1,1,1,0,1,0},},
+		},
+		Index: 0,
+	}
+
+	return model {
+		Title: "Habit Tracker",
+		HabitView: hv,
+		HelpOptions: "q to exit",
 	}
 }
 
