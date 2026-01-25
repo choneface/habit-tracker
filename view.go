@@ -4,8 +4,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 var mainStyle = lipgloss.NewStyle().
-	AlignHorizontal(lipgloss.Center).
-	AlignVertical(lipgloss.Center)
+	Margin(1, 2)
 
 var titleBarStyle = lipgloss.NewStyle().
     Bold(true).
