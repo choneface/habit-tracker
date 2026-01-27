@@ -47,17 +47,7 @@ type model struct {
 
 func NewModel(title string) model {
 	hv := habitView {
-		Habits: []habit{
-			{ 
-				"Chinese Lessons", 
-				"Need passable chinese before having a kid",
-				[]byte{1,0,1,1,0,1,0,1,0,1,1,1,0,1,0},
-			}, {
-				"Spanish Lessons", 
-				"Need passable spanish before having a kid",
-				[]byte{0,1,0,1,0,1,1,1,0,1,1,0,0,0,1},
-			},
-		},
+		Habits: getHabits(), 
 		Index: 0,
 	}
 
@@ -169,7 +159,10 @@ func (m model) inputModeUpdate(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.mode = habit_view_mode
 			break
 		case key.Matches(msg, inputKeys.Submit):
-			// TODO handle this 
+			t := m.Input.Title.Value()
+			d := m.Input.Description.Value()
+			saveNewHabit(t, d)
+			m.HabitView.Habits = getHabits()
 			break
 		case key.Matches(msg, inputKeys.Help):
 			m.help.ShowAll = !m.help.ShowAll
