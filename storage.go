@@ -1,6 +1,6 @@
 package main
 
-var habits = []habit {
+var habits = []Habit {
 	{ 
 		"Chinese Lessons", 
 		"Need passable chinese before having a kid",
@@ -12,23 +12,23 @@ var habits = []habit {
 	},
 }
 
-func getHabits() []habit {
+func GetHabits() []Habit {
 	return habits 
 }
 
-func saveHabit(h habit) {
+func SaveHabit(h Habit) {
 	habits = append(habits, h)
 }
 
-func saveNewHabit(t string, d string) {
-	h := habit {
+func SaveNewHabit(t string, d string) {
+	h := Habit {
 		Title: t,
 		Description: d,
-		History: _generateHistory(),
+		History: generateHistory(),
 	}
 	habits = append(habits, h)
 }
 
-func _generateHistory() []byte {
+func generateHistory() []byte {
 	return make([]byte, 15)
 }

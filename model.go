@@ -11,43 +11,43 @@ import (
 var blurredStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("240"))
 
 const (
-	habit_view_mode = 0
-	input_mode = 1
+	HabitViewMode = 0
+	InputMode = 1
 )
 
 
-type habit struct {
+type Habit struct {
 	Title string
 	Description string 
 	History []byte 
 }
 
-type input struct {
+type Input struct {
 	Title textinput.Model
 	Description textinput.Model
-	FocusIndex int
+	focusIndex int
 }
 
 type habitView struct {
-	Habits []habit
+	Habits []Habit
 	Index int
 }
 
-type model struct {
+type Model struct {
 	Title string
 	HabitView habitView
-	Input input 
+	Input Input 
 
-	mode uint8 
+	Mode uint8 
 	habitViewKeys habitViewKeyMap
-	help help.Model
+	Help help.Model
 }
 
 
 
-func NewModel(title string) model {
+func NewModel(title string) Model {
 	hv := habitView {
-		Habits: getHabits(), 
+		Habits: GetHabits(), 
 		Index: 0,
 	}
 
@@ -68,47 +68,47 @@ func NewModel(title string) model {
 	d.TextStyle = blurredStyle
 	d.Width = 32
 
-	i := input{
+	i := Input{
 		Title: t,
 		Description: d,
-		FocusIndex: 0, 
+		focusIndex: 0, 
 	}
 
-	return model {
+	return Model {
 		Title: "Habit Tracker",
 		HabitView: hv,
 		Input: i,
-		mode: habit_view_mode,
-		habitViewKeys: keys,
-		help: help.New(),
+		Mode: HabitViewMode,
+		habitViewKeys: habitViewKeys,
+		Help: help.New(),
 	}
 }
 
-func (m model) Init() tea.Cmd {
+func (m Model) Init() tea.Cmd {
 	return nil
 }
 
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	switch (m.mode) {
-	case habit_view_mode:
+func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	switch (m.Mode) {
+	case HabitViewMode:
 		return m.habitViewModeUpdate(msg)
-	case input_mode:
+	case InputMode:
 		return m.inputModeUpdate(msg)
 	} 
 	panic("Unsupported mode")
 }
 
-func (m model) inputModeUpdate(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m Model) inputModeUpdate(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, inputKeys.Up):
-			m.Input.FocusIndex += 1
-			if m.Input.FocusIndex > 1 {
-				m.Input.FocusIndex = 0
+			m.Input.focusIndex += 1
+			if m.Input.focusIndex > 1 {
+				m.Input.focusIndex = 0
 			}
 			var cmd tea.Cmd
-			if m.Input.FocusIndex == 0 {
+			if m.Input.focusIndex == 0 {
 				cmd = m.Input.Title.Focus()
 				m.Input.Description.Blur()
 
@@ -129,13 +129,13 @@ func (m model) inputModeUpdate(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			return m, cmd
 		case key.Matches(msg, inputKeys.Down):
-			m.Input.FocusIndex -= 1
-			if m.Input.FocusIndex < 0 {
-				m.Input.FocusIndex = 1
+			m.Input.focusIndex -= 1
+			if m.Input.focusIndex < 0 {
+				m.Input.focusIndex = 1
 			}
 
 			var cmd tea.Cmd
-			if m.Input.FocusIndex == 0 {
+			if m.Input.focusIndex == 0 {
 				cmd = m.Input.Title.Focus()
 				m.Input.Description.Blur()
 
@@ -156,16 +156,16 @@ func (m model) inputModeUpdate(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			return m, cmd
 		case key.Matches(msg, inputKeys.Quit):
-			m.mode = habit_view_mode
+			m.Mode = HabitViewMode
 			break
 		case key.Matches(msg, inputKeys.Submit):
 			t := m.Input.Title.Value()
 			d := m.Input.Description.Value()
-			saveNewHabit(t, d)
-			m.HabitView.Habits = getHabits()
+			SaveNewHabit(t, d)
+			m.HabitView.Habits = GetHabits()
 			break
 		case key.Matches(msg, inputKeys.Help):
-			m.help.ShowAll = !m.help.ShowAll
+			m.Help.ShowAll = !m.Help.ShowAll
 			break
 		}
 	}
@@ -176,7 +176,7 @@ func (m model) inputModeUpdate(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, tea.Batch(cmd1, cmd2) 
 }
 
-func (m model) habitViewModeUpdate(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m Model) habitViewModeUpdate(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 		case tea.KeyMsg:
 			switch {
@@ -197,10 +197,10 @@ func (m model) habitViewModeUpdate(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.HabitView.Index = idx 
 				break
 			case key.Matches(msg, m.habitViewKeys.Help):
-				m.help.ShowAll = !m.help.ShowAll
+				m.Help.ShowAll = !m.Help.ShowAll
 				break
 			case key.Matches(msg, m.habitViewKeys.AddHabit):
-				m.mode = input_mode
+				m.Mode = InputMode
 				break
 		}
 	}

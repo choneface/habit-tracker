@@ -4,7 +4,7 @@ import (
 	"github.com/charmbracelet/bubbles/key"
 )
 
-var keys = habitViewKeyMap {
+var habitViewKeys = habitViewKeyMap {
 	Left: key.NewBinding(
 		key.WithKeys("left", "h"),
 		key.WithHelp("←/h", "move left"),

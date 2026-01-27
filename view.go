@@ -1,7 +1,6 @@
 package main
 
 import (
-	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
 var mainStyle = lipgloss.NewStyle().
@@ -18,7 +17,7 @@ var containerStyle = lipgloss.NewStyle().
 	BorderStyle(lipgloss.NormalBorder()).
 	BorderForeground(lipgloss.Color("FAFAFA"))
 
-func (m model) View() string {
+func (m Model) View() string {
 	content := ""
 	content += titleBarStyle.Render(m.Title) + "\n" 
 	content += (containerStyle.Render(m.mainContent())) + "\n"
@@ -28,36 +27,36 @@ func (m model) View() string {
 }
 
 
-func (m model) mainContent() string {
-	switch(m.mode){
-	case habit_view_mode:
+func (m Model) mainContent() string {
+	switch(m.Mode){
+	case HabitViewMode:
 		return m.habitView()
-	case input_mode:
+	case InputMode:
 		return m.inputView() 
 	}
 	panic("Unsupported mode")
 }
 
-func (m model) helpContent() string {
-	switch (m.mode) {
-	case habit_view_mode :
-		return m.help.View(m.habitViewKeys)
-	case input_mode :
-		return m.help.View(inputKeys) 
+func (m Model) helpContent() string {
+	switch (m.Mode) {
+	case HabitViewMode :
+		return m.Help.View(m.habitViewKeys)
+	case InputMode :
+		return m.Help.View(inputKeys) 
 	}
 	panic("Unsupported mode")
 }
 
-func (m model) habitView() string {
+func (m Model) habitView() string {
 	return ( headerStyle.Render(m.HabitView.Habits[m.HabitView.Index].Title) ) + "\n\n" + 
 	(renderHabitGrid(m.HabitView.Habits[m.HabitView.Index]))
 }
 
-func (m model) inputView() string {
+func (m Model) inputView() string {
 	return m.Input.Title.View() + "\n" + m.Input.Description.View() + "\n" 
 }
 
-func renderHabitGrid(h habit) string {
+func renderHabitGrid(h Habit) string {
 	ret := ""
 	for index, value := range h.History {
 		block := emptyBlock()
@@ -82,30 +81,4 @@ func emptyBlock() string {
 	var blockStyle= lipgloss.NewStyle().
 		Foreground(lipgloss.Color("#171C24"))
 	return blockStyle.Render("██")
-}
-
-func (i input) toggleInputFocus() tea.Cmd {
-	var blurredStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("240"))
-
-	var cmd tea.Cmd
-	if i.FocusIndex == 0 {
-		cmd = i.Title.Focus()
-		i.Description.Blur()
-
-		i.Title.TextStyle = headerStyle 
-		i.Title.PromptStyle = headerStyle
-
-		i.Description.TextStyle = blurredStyle
-		i.Description.PromptStyle = blurredStyle
-	} else {
-		cmd = i.Description.Focus()
-		i.Title.Blur()
-
-		i.Description.TextStyle = headerStyle 
-		i.Description.PromptStyle = headerStyle
-
-		i.Title.TextStyle = blurredStyle
-		i.Title.PromptStyle = blurredStyle
-	}
-	return cmd 
 }
