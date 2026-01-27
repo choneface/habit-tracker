@@ -68,6 +68,7 @@ func NewModel(title string) model {
 	t.PromptStyle = headerStyle
 	t.TextStyle = headerStyle
 	t.Focus()
+	t.Width = 32
 
 	var d textinput.Model 
 	d = textinput.New()
@@ -75,6 +76,7 @@ func NewModel(title string) model {
 	d.CharLimit = 32
 	d.PromptStyle = blurredStyle
 	d.TextStyle = blurredStyle
+	d.Width = 32
 
 	i := input{
 		Title: t,
