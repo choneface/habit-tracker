@@ -1,11 +1,13 @@
 package main
 
 import (
+	"log"
+
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textinput"
-	"github.com/charmbracelet/lipgloss"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 )
 
 var blurredStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("240"))
@@ -41,13 +43,15 @@ type Model struct {
 	Mode uint8 
 	habitViewKeys habitViewKeyMap
 	Help help.Model
+
+	storage Storage
 }
 
 
 
-func NewModel(title string) Model {
+func NewModel(s Storage) Model {
 	hv := habitView {
-		Habits: GetHabits(), 
+		Habits: s.GetHabits(), 
 		Index: 0,
 	}
 
@@ -74,13 +78,20 @@ func NewModel(title string) Model {
 		focusIndex: 0, 
 	}
 
+	var mode uint8 
+	mode = HabitViewMode
+	if len(hv.Habits) == 0 {
+		mode = InputMode
+	}
+
 	return Model {
 		Title: "Habit Tracker",
 		HabitView: hv,
 		Input: i,
-		Mode: HabitViewMode,
+		Mode: mode,
 		habitViewKeys: habitViewKeys,
 		Help: help.New(),
+		storage: s,
 	}
 }
 
@@ -161,8 +172,9 @@ func (m Model) inputModeUpdate(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, inputKeys.Submit):
 			t := m.Input.Title.Value()
 			d := m.Input.Description.Value()
-			SaveNewHabit(t, d)
-			m.HabitView.Habits = GetHabits()
+			m.storage.SaveNewHabit(t, d)
+			m.HabitView.Habits = m.storage.GetHabits()
+			log.Printf("Habit length: %d", len(m.HabitView.Habits))
 			break
 		case key.Matches(msg, inputKeys.Help):
 			m.Help.ShowAll = !m.Help.ShowAll

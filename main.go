@@ -1,13 +1,17 @@
 package main
 
-import ( 
+import (
 	"fmt"
 	"os"
+
 	tea "github.com/charmbracelet/bubbletea"
 )
 
 func main() {
-	m := NewModel("Hello World")
+	s := Init()
+	defer s.db.Close()
+	
+	m := NewModel(s)
 	p := tea.NewProgram(m, tea.WithAltScreen())
 
 	if _, err := p.Run(); err != nil {
