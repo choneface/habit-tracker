@@ -174,7 +174,6 @@ func (m Model) inputModeUpdate(msg tea.Msg) (tea.Model, tea.Cmd) {
 			d := m.Input.Description.Value()
 			m.storage.SaveNewHabit(t, d)
 			m.HabitView.Habits = m.storage.GetHabits()
-			log.Printf("Habit length: %d", len(m.HabitView.Habits))
 			break
 		case key.Matches(msg, inputKeys.Help):
 			m.Help.ShowAll = !m.Help.ShowAll

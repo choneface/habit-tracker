@@ -26,9 +26,8 @@ var habits = []Habit {
 func Init() Storage {
 	db, err := sql.Open("sqlite3", "./database.db")
 	if err != nil {
-		log.Print("Failed to open DB, closing")
 		db.Close()
-		panic("DB init failed, panicking")
+		log.Fatal("Failed to open DB, closing")
 	}
 
 	createHabitTable := `
@@ -41,9 +40,8 @@ func Init() Storage {
 	`
 	_, err = db.Exec(createHabitTable)
 	if err != nil {
-		log.Print("Failed to create habit table, closing")
 		db.Close()
-		panic("DB init failed, panicking")
+		log.Fatal("Failed to create habit table, closing")
 	}
 
 	createHistoryTable := `
@@ -56,9 +54,8 @@ func Init() Storage {
 	`
 	_, err = db.Exec(createHistoryTable)
 	if err != nil {
-		log.Print("Failed to create history table, closing")
 		db.Close()
-		panic("DB init failed, panicking")
+		log.Fatal("Failed to create history table, closing")
 	}
 
 	return Storage{
@@ -83,7 +80,6 @@ func (s Storage) GetHabits() []Habit {
 			Description: description,
 			History: generateHistory(),
 		}
-		log.Printf("id: %d, title: %s, description: %s\n", id, title, description)
 		ret = append(ret, tmp)
 	}
 	return ret 
@@ -94,7 +90,6 @@ func (s Storage) SaveNewHabit(t string, d string) {
 }
 
 func (s Storage) fetchHabits() *sql.Rows {
-	log.Print("Fetching Habits")
 	statement := `
 	select * from habit;
 	`
