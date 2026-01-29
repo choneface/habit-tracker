@@ -89,7 +89,6 @@ func (s Storage) GetHabits() []Habit {
 		}
 		ret = append(ret, tmp)
 	}
-	log.Printf("Number of rows: %d", count)
 	return ret 
 }
 
@@ -116,7 +115,6 @@ func (s Storage) fetchHabitsWithHistory(cutoff time.Time) *sql.Rows {
 		log.Fatalf("Failed to prepare habits query \n%s", err.Error()) 
 	}
 	cutoffString := cutoff.Format("2006-01-02")
-	log.Printf("cutoff string: %s", cutoffString)
 	rows, err := statement.Query(cutoffString)
 	if err != nil {
 		log.Fatalf("Failed to fetch habits from DB\n%s", err.Error()) 
