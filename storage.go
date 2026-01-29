@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"log"
+	"time"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -65,13 +66,19 @@ func Init() Storage {
 
 func (s Storage) GetHabits() []Habit {
 	ret := []Habit{}
-	rows := s.fetchHabits()
+
+	cutoffTime := time.Now().AddDate(0, -1, 0)
+	rows := s.fetchHabitsWithHistory(cutoffTime)
+	count := 0
 	for rows.Next() {
+		count = count + 1
 		var id int
 		var title string 
 		var description string
 		var color string 
-		err := rows.Scan(&id, &title, &description, &color)
+		var date sql.NullString
+		var value sql.NullByte 
+		err := rows.Scan(&id, &title, &description, &color, &date, &value)
 		if err != nil {
 			log.Fatalf("Failed to scan row \n %s", err.Error())
 		}
@@ -82,6 +89,7 @@ func (s Storage) GetHabits() []Habit {
 		}
 		ret = append(ret, tmp)
 	}
+	log.Printf("Number of rows: %d", count)
 	return ret 
 }
 
@@ -89,11 +97,27 @@ func (s Storage) SaveNewHabit(t string, d string) {
 	s.insertHabit(t, d, "#6ceb8e")
 }
 
-func (s Storage) fetchHabits() *sql.Rows {
-	statement := `
-	select * from habit;
+func (s Storage) fetchHabitsWithHistory(cutoff time.Time) *sql.Rows {
+	raw := `
+	select 
+		habit.id, 
+		habit.title, 
+		habit.description, 
+		habit.color,
+		history.date,
+		history.value
+	from habit
+	left join history on habit.id = history.habit_id
+	where (history.date is null or history.date != ?)
+	order by date desc;
 	`
-	rows, err := s.db.Query(statement)
+	statement, err := s.db.Prepare(raw)
+	if err != nil {
+		log.Fatalf("Failed to prepare habits query \n%s", err.Error()) 
+	}
+	cutoffString := cutoff.Format("2006-01-02")
+	log.Printf("cutoff string: %s", cutoffString)
+	rows, err := statement.Query(cutoffString)
 	if err != nil {
 		log.Fatalf("Failed to fetch habits from DB\n%s", err.Error()) 
 	}

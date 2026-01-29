@@ -1,8 +1,6 @@
 package main
 
 import (
-	"log"
-
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textinput"
